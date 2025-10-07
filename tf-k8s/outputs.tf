@@ -1,5 +1,6 @@
 output "control_plane_ip" {
-  value = aws_instance.control_plane.public_ip
+  value       = aws_eip.control_plane_eip.public_ip
+  description = "The Elastic IP of the control plane node"
 }
 
 output "worker_ips" {

@@ -50,6 +50,17 @@ resource "aws_security_group" "k8s_sg" {
   }
 }
 
+resource "aws_eip" "control_plane_eip" {
+  instance   = aws_instance.control_plane.id
+  vpc        = true
+
+  tags = {
+    Name = "k8s-control-plane-eip"
+  }
+
+  depends_on = [aws_instance.control_plane]
+}
+
 # Control Plane
 resource "aws_instance" "control_plane" {
   ami                         = data.aws_ami.ubuntu.id
