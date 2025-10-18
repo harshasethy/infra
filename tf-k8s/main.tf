@@ -51,8 +51,8 @@ resource "aws_security_group" "k8s_sg" {
 }
 
 resource "aws_eip" "control_plane_eip" {
-  instance   = aws_instance.control_plane.id
-  vpc        = true
+  instance = aws_instance.control_plane.id
+  domain   = "vpc"
 
   tags = {
     Name = "k8s-control-plane-eip"
