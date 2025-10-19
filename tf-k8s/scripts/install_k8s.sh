@@ -19,7 +19,8 @@ sudo apt-get install -y containerd.io
 
 # Configure containerd
 sudo mkdir -p /etc/containerd
-containerd config default | sudo tee /etc/containerd/config.toml
+containerd config default | sudo tee /etc/containerd/config.toml >/dev/null
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 sudo systemctl restart containerd
 sudo systemctl enable containerd
 

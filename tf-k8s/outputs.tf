@@ -4,5 +4,6 @@ output "control_plane_ip" {
 }
 
 output "worker_ips" {
-  value = [for w in aws_instance.workers : w.public_ip]
+  value       = [for w in aws_instance.workers : w.public_ip]
+  description = "Public IPs of worker nodes"
 }

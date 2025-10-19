@@ -9,6 +9,44 @@ data "aws_subnets" "default" {
   }
 }
 
+# Common bootstrap to satisfy kubeadm preflight and containerd settings
+locals {
+  common_boot = <<-BASH
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    # Kernel modules
+    sudo modprobe overlay || true
+    sudo modprobe br_netfilter || true
+    printf "overlay\nbr_netfilter\n" | sudo tee /etc/modules-load.d/k8s.conf >/dev/null
+
+    # Sysctls for k8s networking
+    sudo tee /etc/sysctl.d/99-kubernetes-cri.conf >/dev/null <<'EOF'
+    net.bridge.bridge-nf-call-iptables = 1
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.ipv4.ip_forward = 1
+    EOF
+    sudo sysctl --system
+
+    # Containerd config with systemd cgroup (only once containerd exists)
+    if command -v containerd >/dev/null 2>&1; then
+      sudo mkdir -p /etc/containerd
+      if ! [ -s /etc/containerd/config.toml ]; then
+        containerd config default | sudo tee /etc/containerd/config.toml >/dev/null
+      fi
+      sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+      sudo systemctl restart containerd || true
+    fi
+
+    # Disable swap (kubelet requirement)
+    sudo swapoff -a || true
+    sudo sed -i.bak '/\sswap\s/d' /etc/fstab || true
+
+    # Make sure kubelet is enabled (it will wait for kubeadm)
+    sudo systemctl enable --now kubelet || true
+  BASH
+}
+
 resource "aws_security_group" "k8s_sg" {
   name        = "k8s-sg"
   description = "Allow SSH and Kubernetes traffic"
@@ -75,6 +113,8 @@ resource "aws_instance" "control_plane" {
   }
 
   user_data = join("\n", [
+    local.common_boot,
+    "",
     file("${path.module}/scripts/install_k8s.sh"),
     "",
     file("${path.module}/scripts/control_plane.sh"),
@@ -104,6 +144,8 @@ resource "aws_instance" "workers" {
   }
 
   user_data = join("\n", [
+    local.common_boot,
+    "",
     file("${path.module}/scripts/install_k8s.sh"),
     "",
     file("${path.module}/scripts/worker.sh"),
