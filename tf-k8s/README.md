@@ -57,7 +57,12 @@ Edit `variables.tf` or supply `-var`/`-var-file` flags to change these values. Y
 ## Scripts
 - `scripts/install_k8s.sh`: Common bootstrap script that updates the OS, configures containerd, and installs kubelet/kubeadm/kubectl 1.29.
 - `scripts/control_plane.sh`: Initializes the cluster with `kubeadm init` using a Calico CNI pod network CIDR of `192.168.0.0/16`, and configures `kubectl` for the default user.
+- run kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 - `scripts/worker.sh`: Placeholder that reminds you to run the `kubeadm join` command manually after you generate it on the control plane.
+and copy /etc/kubernetes/admin.conf from CP to workker node at ~/.kube/config
+on worker - run 
+            chmod 600 ~/.kube/config
+            kubectl get nodes
 
 ## Cleanup
 Destroy all created infrastructure once you no longer need the cluster:
