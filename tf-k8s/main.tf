@@ -76,6 +76,24 @@ resource "aws_security_group" "k8s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Calico BGP (needed when using the default BGP mode instead of VXLAN/IPIP overlays)
+  ingress {
+    description = "Calico BGP"
+    from_port   = 179
+    to_port     = 179
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Intra-cluster traffic (pod-to-pod/node-to-node) within the VPC CIDR
+  ingress {
+    description = "Kubernetes cluster internal traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

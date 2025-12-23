@@ -11,6 +11,8 @@ sudo kubeadm init --pod-network-cidr=192.168.0.0/16
 mkdir -p "$HOME/.kube"
 sudo cp /etc/kubernetes/admin.conf "$HOME/.kube/config"
 sudo chown "$(id -u)":"$(id -g)" "$HOME/.kube/config"
+# Ensure kubectl uses the freshly generated admin kubeconfig even if HOME is unset later
+export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # Also set up kubectl for the default ubuntu user when present
 if id ubuntu >/dev/null 2>&1; then
@@ -21,8 +23,8 @@ fi
 
 # Wait for the Kubernetes API server to become ready before applying addons
 api_ready=false
-for attempt in $(seq 1 30); do
-  if kubectl get --raw='/readyz?verbose' >/dev/null 2>&1; then
+for attempt in $(seq 1 60); do
+  if kubectl --kubeconfig "$KUBECONFIG" get --raw='/readyz?verbose' >/dev/null 2>&1; then
     api_ready=true
     break
   fi
@@ -35,4 +37,4 @@ if [ "$api_ready" != "true" ]; then
 fi
 
 # Install Calico CNI
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl --kubeconfig "$KUBECONFIG" apply -f https://docs.projectcalico.org/manifests/calico.yaml
