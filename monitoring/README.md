@@ -43,3 +43,46 @@ cd /path/to/monitoring
 
 - `install-monitoring.sh` will install Helm automatically if it is not present on the host.
 - The script uses `--validate=false` for `kubectl apply` to avoid API discovery issues when validating manifests.
+
+## Configuring Alert Notifications
+
+Custom alerts are defined in `alerts/custom-alerts.yaml` and fire when conditions are met (e.g., high CPU, node exporter down). By default, alerts are **not** sent to any external service.
+
+### Enable notifications
+
+Edit `values.yaml` and uncomment the receiver configuration for your preferred channel:
+
+#### Email (Gmail/SMTP)
+```yaml
+email_configs:
+  - to: 'your-email@example.com'
+    from: 'alertmanager@example.com'
+    smarthost: 'smtp.gmail.com:587'
+    auth_username: 'your-email@gmail.com'
+    auth_password: 'your-app-password'
+```
+
+#### Slack
+```yaml
+slack_configs:
+  - api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+    channel: '#alerts'
+    title: 'Prometheus Alert'
+    text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+```
+
+#### PagerDuty
+```yaml
+pagerduty_configs:
+  - service_key: 'YOUR_PAGERDUTY_SERVICE_KEY'
+```
+
+After updating `values.yaml`, rerun the installer to apply the new configuration:
+```bash
+./install-monitoring-remote.sh --host <control-plane-ip> --key <path/to/key.pem> --user ubuntu
+```
+
+Or locally:
+```bash
+./install-monitoring.sh
+```
