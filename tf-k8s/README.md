@@ -5,7 +5,7 @@ This configuration provisions a minimal Kubernetes cluster on AWS using Terrafor
 
 ## Architecture Highlights
 - Uses the AWS default VPC and its subnets for networking.
-- Creates a security group that opens SSH (22), the Kubernetes API (6443), and the default NodePort range (30000-32767).
+- Creates a security group that opens SSH (22), the Kubernetes API (6443), the default NodePort range (30000-32767), Calico BGP (179), and Grafana (3000).
 - Launches one control-plane instance and spot instances for workers, each with the canonical Ubuntu 22.04 LTS AMI.
 - Runs `scripts/install_k8s.sh` to install containerd and Kubernetes 1.29 components, then role-specific scripts for control-plane initialization and worker preparation.
 - Leaves the final `kubeadm join` step to be executed manually on each worker so you can control token lifetime and approval.
@@ -77,3 +77,4 @@ terraform destroy
 - Worker instances run as EC2 Spot; they can be reclaimed by AWS. Adjust `instance_market_options` if on-demand capacity is required.
 - The security group allows access from anywhere; restrict CIDR ranges for production use.
 - The kubeadm join command expires; regenerate it if workers are added later or if provisioning takes longer than the token TTL.
+- Port 3000 is open for Grafana monitoring access when Prometheus monitoring stack is installed via the `../monitoring/` setup.
