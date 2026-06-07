@@ -76,6 +76,14 @@ resource "aws_security_group" "k8s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Grafana"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Calico BGP (needed when using the default BGP mode instead of VXLAN/IPIP overlays)
   ingress {
     description = "Calico BGP"
