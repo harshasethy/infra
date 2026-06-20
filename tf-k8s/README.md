@@ -55,7 +55,7 @@ This configuration provisions a minimal Kubernetes cluster on AWS using Terrafor
 Edit `variables.tf` or supply `-var`/`-var-file` flags to change these values. You can also duplicate the module to target multiple regions or VPCs if desired.
 
 ## Scripts
-- `scripts/install_k8s.sh`: Common bootstrap script that updates the OS, configures containerd, and installs kubelet/kubeadm/kubectl 1.29.
+- `scripts/install_k8s.sh`: Common bootstrap script that updates the OS, configures containerd, and installs kubelet/kubeadm/kubectl 1.33.
 - `scripts/control_plane.sh`: Initializes the cluster with `kubeadm init` using a Calico CNI pod network CIDR of `192.168.0.0/16`, and configures `kubectl` for the default user.
 - run kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 - `scripts/worker.sh`: Placeholder that reminds you to run the `kubeadm join` command manually after you generate it on the control plane.
