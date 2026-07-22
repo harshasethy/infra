@@ -17,11 +17,16 @@ Default dashboards should include:
 - Pod and container resource usage
 - Alerts and notification status
 
-## Screenshot placeholders
+## Example screenshots
 
-![Grafana Dashboard Screenshot](screenshots/grafana-dashboard.svg)
+The following images reflect the current cluster and monitoring setup and can be updated later with higher-quality exports:
 
-> Replace the placeholder screenshot with a real Grafana dashboard export for this environment.
+
+![Grafana dashboard view](screenshots/grafana-dashboard.png)
+
+![Monitoring alerts overview](screenshots/monitoring-alerts-overview.png)
+
+
 
 ## Recommended dashboard panels
 

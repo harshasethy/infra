@@ -20,6 +20,17 @@ cd /path/to/monitoring
 ./install-monitoring.sh
 ```
 
+You can expose Grafana from the control plane using a background `nohup` command (writes logs to `/tmp`):
+
+```bash
+nohup kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80 --address=0.0.0.0 > /tmp/grafana-port-forward.log 2>&1 &
+```
+
+Or run it in the foreground to see output directly:
+
+```bash
+kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80 --address=0.0.0.0
+```
 ### Run from a machine with kubeconfig access
 
 If you want to run this from your laptop, ensure `kubectl` can access the cluster and `helm` is installed.
